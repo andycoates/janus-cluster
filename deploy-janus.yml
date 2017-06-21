@@ -1,0 +1,31 @@
+---
+
+#
+# Infrastructure
+#
+- name: Setup EC2 Infrastructure
+  hosts: localhost
+  gather_facts: false
+  connection: local
+
+  vars_files:
+    - "region/janus-{{ aws_region }}-{{ env_name }}.yml"
+
+  roles:
+    - janus-create-vpc
+    - janus-create-sg
+    - janus-create-key
+    - janus-create-instances
+
+#
+# Janus Configuration
+#
+- name: Setup Janus Configuration
+  hosts: tag_Name_JanusStack*
+  gather_facts: true
+
+  vars:
+    ansible_ssh_private_key_file: "region/janus-{{ aws_region }}-{{ env_name }}.key"
+
+  roles:
+    - { role: janus-install, version: 0.1.1 }

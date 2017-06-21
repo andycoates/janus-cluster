@@ -1,0 +1,28 @@
+---
+- name: Install required system packages
+  become: true
+  package:
+    name: "{{ item }}"
+  with_items: "{{ janus_system_packages }}"
+
+- name: Download JanusGraph
+  get_url:
+    url: "{{ janus_download_url }}"
+    dest: "{{ janus_download_file }}"
+    checksum: md5:3b97513abc57af6e7fd52cb2b8a5ebaa
+
+- name: Create install dir
+  become: true
+  file:
+    path: "{{ janus_install_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Extract JanusGraph
+  unarchive:
+    src: "{{ janus_download_file }}"
+    dest: "{{ janus_install_prefix }}"
+    remote_src: true
+    creates: "{{ janus_install_dir }}/CHANGELOG.asc"
+

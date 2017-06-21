@@ -1,0 +1,45 @@
+---
+- name: Create a VPC for this environment
+  ec2_vpc_net:
+    region: "{{ env.region }}"
+    name: "JanusVpc_{{ env.name }}"
+    cidr_block: "{{ env.vpc_cidr }}"
+    state: present
+  register: janus_vpc
+
+- name: Lookup VPC routing table entry
+  ec2_vpc_route_table_facts:
+    region: "{{ env.region }}"
+    filters:
+      vpc-id: "{{ janus_vpc.vpc.id }}"
+  register: janus_vpc_route_facts
+
+- name: Create an Internet Gateway for the VPC
+  ec2_vpc_igw:
+    region: "{{ env.region }}"
+    vpc_id: "{{ janus_vpc.vpc.id }}"
+    state: present
+  register: janus_vpc_igw
+
+- name: Create routing table entry for Internet Gateway
+  ec2_vpc_route_table:
+    region: "{{ env.region }}"
+    vpc_id: "{{ janus_vpc.vpc.id }}"
+    # UGLY HACK? How else do you update routing tables when you don't know the route_table_id ???
+    route_table_id: "{{ janus_vpc_route_facts.route_tables[0].id }}"
+    lookup: id
+    routes:
+      - dest: 0.0.0.0/0
+        gateway_id: "{{ janus_vpc_igw.gateway_id }}"
+
+- name: Create a subnet per zone
+  ec2_vpc_subnet:
+    region: "{{ env.region }}"
+    vpc_id: "{{ janus_vpc.vpc.id }}"
+    az: "{{ item.zone }}"
+    cidr: "{{ item.subnet_cidr }}"
+    tags:
+      Name: "JanusSubnet_{{ env.name }}_{{ item.zone }}"
+    state: present
+  with_items: "{{ env.zones }}"
+  register: janus_vpc_subnets

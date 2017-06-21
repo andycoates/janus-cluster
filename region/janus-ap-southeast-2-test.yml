@@ -1,0 +1,14 @@
+---
+env:
+  region: "{{ aws_region }}"
+  name: "{{ env_name }}"
+  instance_type: t2.micro
+  ami: ami-34171d57
+  vpc_cidr: "10.0.0.0/23"
+  zones:
+    - zone: "{{ aws_region }}a"
+      subnet_cidr: "10.0.0.0/24"
+      servers: 2
+    - zone: "{{ aws_region }}c"
+      subnet_cidr: "10.0.1.0/24"
+      servers: 2

@@ -1,0 +1,26 @@
+---
+#- debug: var=janus_vpc_subnets.results
+
+- name: Create Janus instances
+  ec2:
+    region: "{{ env.region }}"
+    instance_type: "{{ env.instance_type }}"
+    image: "{{ env.ami }}"
+    assign_public_ip: yes
+    vpc_subnet_id: "{{ item.subnet.id }}"
+    group_id: "{{ janus_sg.group_id }}"
+    key_name: "JanusKey_{{ env.name }}"
+    exact_count: "{{ item.item.servers }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: gp2
+        volume_size: 10
+        delete_on_termination: true
+    count_tag:
+      Name: "JanusStack-{{ item.subnet.availability_zone }}"
+    instance_tags:
+      Name: "JanusStack-{{ item.subnet.availability_zone }}"
+      Env: "{{ env.region }}-{{ env.name }}"
+    wait: yes
+  with_items: "{{ janus_vpc_subnets.results }}"
+  register: janus_ec2_instances

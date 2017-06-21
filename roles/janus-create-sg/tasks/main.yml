@@ -1,0 +1,30 @@
+---
+- name: Create Security Group for Janus instances
+  ec2_group:
+    region: "{{ env.region }}"
+    name: "JanusSg_{{ env.name }}"
+    description: "Security Group for Janus instances"
+    vpc_id: "{{ janus_vpc.vpc.id }}"
+    rules:
+      - proto: tcp
+        from_port: 8182
+        to_port: 8184
+        cidr_ip: "{{ env.vpc_cidr }}"
+      - proto: tcp
+        from_port: 9160
+        to_port: 9160
+        cidr_ip: "{{ env.vpc_cidr }}"
+      - proto: tcp
+        from_port: 7000
+        to_port: 7000
+        cidr_ip: "{{ env.vpc_cidr }}"
+      - proto: tcp
+        from_port: 7199
+        to_port: 7199
+        cidr_ip: "{{ env.vpc_cidr }}"
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 59.167.198.132/32
+    state: present
+  register: janus_sg
