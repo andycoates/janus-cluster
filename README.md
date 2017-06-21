@@ -1,7 +1,7 @@
 
 # Janus Cluster using Ansible
 
-## Parameters
+## Parameters
 
 Ensure the following variables are passed in as extra parameters:
 - `aws_region` (e.g. ap-southeast-2)
@@ -23,6 +23,6 @@ By default it will create a private/public key pair for you in the `region/` dir
 
 If you don't want it to create a new key simply link or copy existing files into the above location.
 
-## SSH Access
+## SSH Access
 
 Ansible will use the location of the keys above to SSH onto the new servers.
