@@ -23,6 +23,30 @@
   unarchive:
     src: "{{ janus_download_file }}"
     dest: "{{ janus_install_prefix }}"
-    remote_src: true
+    remote_src: yes
+    copy: no
     creates: "{{ janus_install_dir }}/CHANGELOG.asc"
 
+- name: Symlink for ease of use
+  become: true
+  file:
+    src: "{{ janus_install_dir }}"
+    dest: "{{ janus_symlink }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: link
+    force: yes
+
+- name: Template JanusGraph configs
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ janus_install_dir }}/{{ item }}"
+  with_items:
+    - conf/cassandra/cassandra.yaml
+    - conf/cassandra/cassandra-rackdc.properties
+    - conf/es/elasticsearch.yml
+    - conf/gremlin-server/janusgraph-cassandra-es-server.properties
+    - conf/gremlin-server/gremlin-server.yaml
+    - conf/janusgraph-cassandra-es.properties
+    - bin/janusgraph.sh
+  tags: configs

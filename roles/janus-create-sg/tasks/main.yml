@@ -16,15 +16,23 @@
         cidr_ip: "{{ env.vpc_cidr }}"
       - proto: tcp
         from_port: 7000
-        to_port: 7000
+        to_port: 7001
         cidr_ip: "{{ env.vpc_cidr }}"
       - proto: tcp
         from_port: 7199
         to_port: 7199
         cidr_ip: "{{ env.vpc_cidr }}"
       - proto: tcp
+        from_port: 9200
+        to_port: 9200
+        cidr_ip: "{{ env.vpc_cidr }}"
+      - proto: tcp
+        from_port: 9300
+        to_port: 9300
+        cidr_ip: "{{ env.vpc_cidr }}"
+      - proto: tcp
         from_port: 22
         to_port: 22
-        cidr_ip: 59.167.198.132/32
+        cidr_ip: 0.0.0.0/0
     state: present
   register: janus_sg

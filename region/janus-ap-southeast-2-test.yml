@@ -2,8 +2,9 @@
 env:
   region: "{{ aws_region }}"
   name: "{{ env_name }}"
-  instance_type: t2.micro
+  instance_type: t2.medium
   ami: ami-34171d57
+  ami_user: centos
   vpc_cidr: "10.0.0.0/23"
   zones:
     - zone: "{{ aws_region }}a"

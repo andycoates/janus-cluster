@@ -1,5 +1,4 @@
 ---
-
 #
 # Infrastructure
 #
@@ -19,13 +18,14 @@
 
 #
 # Janus Configuration
+# NB: Hosts are populated from previous task and setup to provide private ip address information
 #
 - name: Setup Janus Configuration
-  hosts: tag_Name_JanusStack*
+  hosts: "janus-{{ aws_region }}-{{ env_name }}"
   gather_facts: true
 
-  vars:
-    ansible_ssh_private_key_file: "region/janus-{{ aws_region }}-{{ env_name }}.key"
+  vars_files:
+    - "region/janus-{{ aws_region }}-{{ env_name }}.yml"
 
   roles:
     - { role: janus-install, version: 0.1.1 }
