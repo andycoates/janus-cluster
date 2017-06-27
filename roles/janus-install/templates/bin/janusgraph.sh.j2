@@ -76,12 +76,12 @@ wait_for_cassandra_quorum() {
     local stop_s=$(( $now_s + $CASSANDRA_QUORUM_STARTUP_TIMEOUT_S ))
     local status_thrift=
 
-    echo -n 'Running `nodetool status` - looking for at least {{ quorum }} servers alive to meet QUORUM...'
+    echo -n 'Running `nodetool status` - looking for at least {{ cassandra_quorum }} servers alive to meet QUORUM...'
     while [ $now_s -le $stop_s ]; do
         echo -n .
         # The \r\n deletion bit is necessary for Cygwin compatibility
         status_thrift="`$BIN/nodetool status 2>/dev/null | grep -c ^UN`"
-        if [ $? -eq 0 -a "$status_thrift" -ge {{ quorum }} ]; then
+        if [ $? -eq 0 -a "$status_thrift" -ge {{ cassandra_quorum }} ]; then
             echo ' OK (minimum servers are up for QUORUM).'
             return 0
         fi
@@ -166,7 +166,7 @@ start() {
         return 1
     }
     wait_for_cassandra_quorum || {
-        echo "Not enough Cassandra servers have been started yet ({{ quorum }}) and Gremlin Server needs QUORUM to start"    >&2
+        echo "Not enough Cassandra servers have been started yet ({{ cassandra_quorum }}) and Gremlin Server needs QUORUM to start"    >&2
         return 1
     }
     echo "Forking Gremlin-Server..."

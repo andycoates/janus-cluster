@@ -22,6 +22,6 @@ data_pv_disk: /dev/xvdb
 data_vg_name: data
 data_lv_name: data
 
-cassandra_replication: 3
-elasticsearch_replicas: "{{ '%d'|format(groups[cluster_group]|length / 4) }}"
-quorum: "{{ '%d'|format((groups[cluster_group]|length / 2) + 1) }}"
+cassandra_replication: 1
+cassandra_quorum: "{{ '%d'|format( (cassandra_replication*(env.zones|length)/2)+1 |round(method='floor')) }}"
+elasticsearch_replicas: "{{ '%d'|format(groups[cluster_group]|length / 4) if groups[cluster_group]|length > 4 else 1 }}"

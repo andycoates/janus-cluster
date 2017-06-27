@@ -57,7 +57,7 @@
     src: "{{ janus_download_file }}"
     dest: "{{ janus_install_prefix }}"
     remote_src: yes
-    copy: no
+    #copy: no
     creates: "{{ janus_install_dir }}/CHANGELOG.asc"
 
 - name: Symlink for ease of use
