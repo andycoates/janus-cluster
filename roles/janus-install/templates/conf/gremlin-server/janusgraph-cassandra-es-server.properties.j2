@@ -18,8 +18,17 @@ gremlin.graph=org.janusgraph.core.JanusGraphFactory
 # Data Type:  String
 # Mutability: LOCAL
 storage.backend=cassandra
-storage.cassandra.read-consistency-level=LOCAL_QUORUM
-storage.cassandra.write-consistency-level=LOCAL_QUORUM
+{% if env.zones|length > 1 %}
+storage.cassandra.read-consistency-level=LOCAL_ONE
+storage.cassandra.write-consistency-level=LOCAL_ONE
+storage.cassandra.replication-strategy-class=org.apache.cassandra.locator.NetworkTopologyStrategy
+storage.cassandra.replication-strategy-options={% for az in env.zones %}{{ az.zone }},{{ cassandra_replication }}{% if not loop.last %},{% endif %}{% endfor %}
+{% else %}
+storage.cassandra.read-consistency-level=ONE
+storage.cassandra.write-consistency-level=ONE
+#storage.cassandra.replication-factor={{ groups[cluster_group]|length }}
+storage.cassandra.replication-factor={{ cassandra_replication }}
+{% endif %}
 
 # The hostname or comma-separated list of hostnames of storage backend
 # servers.  This is only applicable to some storage backends, such as

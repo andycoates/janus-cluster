@@ -5,6 +5,39 @@
     name: "{{ item }}"
   with_items: "{{ janus_system_packages }}"
 
+- name: Remove unwanted system packages
+  become: true
+  package:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ janus_system_packages_remove }}"
+
+- name: Create LVM physical device and group
+  become: true
+  lvg:
+    pvs: "{{ data_pv_disk }}"
+    vg: "{{ data_vg_name }}"
+
+- name: Create LVM logical volume
+  become: true
+  lvol: vg={{ data_vg_name }} lv={{ data_lv_name }} size="100%VG"
+
+- name: Create LVM logical volume filesystem
+  become: true
+  filesystem: fstype=xfs dev=/dev/{{ data_vg_name }}/{{ data_lv_name }}
+
+- name: Create mount point
+  become: true
+  file: path={{ data_mount }} state=directory owner={{ ansible_user }} group={{ ansible_user}}
+
+- name: Mounting data filesystem
+  become: true
+  mount: name={{ data_mount }} src=/dev/{{ data_vg_name }}/{{ data_lv_name }} fstype=xfs state=mounted
+
+- name: Ensure we own the data disk
+  become: true
+  file: path={{ data_mount }} state=directory owner={{ ansible_user }} group={{ ansible_user}}
+
 - name: Download JanusGraph
   get_url:
     url: "{{ janus_download_url }}"
@@ -44,9 +77,17 @@
   with_items:
     - conf/cassandra/cassandra.yaml
     - conf/cassandra/cassandra-rackdc.properties
+    - conf/cassandra/cassandra-env.sh
     - conf/es/elasticsearch.yml
     - conf/gremlin-server/janusgraph-cassandra-es-server.properties
     - conf/gremlin-server/gremlin-server.yaml
     - conf/janusgraph-cassandra-es.properties
+    - conf/log4j-console.properties
     - bin/janusgraph.sh
   tags: configs
+
+- name: Tweak ulimits
+  become: true
+  template:
+    src: "system/nofiles.conf.j2"
+    dest: "/etc/security/limits.d/90-nofiles.conf"

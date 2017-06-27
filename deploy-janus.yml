@@ -6,6 +6,7 @@
   hosts: localhost
   gather_facts: false
   connection: local
+  tags: start
 
   vars_files:
     - "region/janus-{{ aws_region }}-{{ env_name }}.yml"
@@ -21,8 +22,10 @@
 # NB: Hosts are populated from previous task and setup to provide private ip address information
 #
 - name: Setup Janus Configuration
-  hosts: "janus-{{ aws_region }}-{{ env_name }}"
+  hosts: "{{ env.cluster_name }}"
+  serial: "{{ env.zones|sum(attribute='servers') }}"
   gather_facts: true
+  tags: setup
 
   vars_files:
     - "region/janus-{{ aws_region }}-{{ env_name }}.yml"

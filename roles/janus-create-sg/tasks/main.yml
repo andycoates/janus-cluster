@@ -31,6 +31,10 @@
         to_port: 9300
         cidr_ip: "{{ env.vpc_cidr }}"
       - proto: tcp
+        from_port: 9042
+        to_port: 9042
+        cidr_ip: "{{ env.vpc_cidr }}"
+      - proto: tcp
         from_port: 22
         to_port: 22
         cidr_ip: 0.0.0.0/0

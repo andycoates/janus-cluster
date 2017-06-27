@@ -2,14 +2,17 @@
 env:
   region: "{{ aws_region }}"
   name: "{{ env_name }}"
-  instance_type: t2.medium
-  ami: ami-34171d57
-  ami_user: centos
+  cluster_name: "janus-{{ aws_region }}-{{ env_name }}"
+  instance_type: m4.xlarge
+  ami: ami-a18392c2  # Amazon AMI
+  ami_user: ec2-user
+  ami_root_gb: 50
+  ami_data_gb: 100
   vpc_cidr: "10.0.0.0/23"
   zones:
     - zone: "{{ aws_region }}a"
       subnet_cidr: "10.0.0.0/24"
-      servers: 2
-    - zone: "{{ aws_region }}c"
-      subnet_cidr: "10.0.1.0/24"
-      servers: 2
+      servers: 10
+    #- zone: "{{ aws_region }}c"
+    #  subnet_cidr: "10.0.1.0/24"
+    #  servers: 4

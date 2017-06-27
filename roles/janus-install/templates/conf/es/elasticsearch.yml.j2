@@ -29,7 +29,7 @@
 # Cluster name identifies your cluster for auto-discovery. If you're running
 # multiple clusters on the same network, make sure you're using unique names.
 #
-cluster.name: elasticsearch-{{ env.region }}-{{ env.name }}
+cluster.name: elasticsearch-{{ env.cluster_name }}
 
 
 #################################### Node #####################################
@@ -108,7 +108,8 @@ cluster.name: elasticsearch-{{ env.region }}-{{ env.name }}
 
 # Set the number of replicas (additional copies) of an index (1 by default):
 #
-index.number_of_replicas: {{ (groups['janus-'+aws_region+'-'+env_name]|length)-1 }}
+#index.number_of_replicas: {{ (groups[env.cluster_name]|length)-1 }}
+index.number_of_replicas: {{ elasticsearch_replicas }}
 
 # Note, that for development on a local machine, with small indices, it usually
 # makes sense to "disable" the distributed features:
@@ -332,7 +333,7 @@ network.host: {{ private_ip }}
 # 2. Configure an initial list of master nodes in the cluster
 #    to perform discovery when new nodes (master or data) are started:
 #
-discovery.zen.ping.unicast.hosts: [{% for host in groups['janus-'+aws_region+'-'+env_name] %}"{{ hostvars[host].private_ip }}"{% if not loop.last %},{% endif %}{% endfor %}]
+discovery.zen.ping.unicast.hosts: {{ groups[env.cluster_name]|map('extract',hostvars,['private_ip'])|list|to_yaml }}
 
 # EC2 discovery allows to use AWS EC2 API in order to perform discovery.
 #

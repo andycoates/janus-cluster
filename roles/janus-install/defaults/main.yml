@@ -7,6 +7,21 @@ janus_install_prefix: /opt
 janus_install_dir: "{{ janus_install_prefix }}/{{ janus_dir }}"
 janus_symlink: /opt/janus
 janus_system_packages:
+  - xfsprogs
+  - lvm2
   - unzip
-  - java
-  - java-devel
+  - java-1.8.0-openjdk
+  - java-1.8.0-openjdk-devel
+  - dstat
+janus_system_packages_remove:
+  - java-1.7.0-openjdk
+  - java-1.7.0-openjdk-devel
+
+data_mount: /data
+data_pv_disk: /dev/xvdb
+data_vg_name: data
+data_lv_name: data
+
+cassandra_replication: 3
+elasticsearch_replicas: "{{ '%d'|format(groups[cluster_group]|length / 4) }}"
+quorum: "{{ '%d'|format((groups[cluster_group]|length / 2) + 1) }}"

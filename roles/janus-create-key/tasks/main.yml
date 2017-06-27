@@ -1,7 +1,7 @@
 ---
 - name: Check if we have an existing key
   stat:
-    path: "region/janus-{{ aws_region }}-{{ env_name }}.key.pub"
+    path: "region/{{ env.cluster_name }}.key.pub"
   register: janus_pubkeyfile
 
 - name: Create EC2 public key to access instances
@@ -14,12 +14,12 @@
 - name: Store private key locally
   copy:
     content: "{{ janus_privkey.key.private_key }}"
-    dest: "region/janus-{{ env.region }}-{{ env.name }}.key"
+    dest: "region/{{ env.cluster_name }}.key"
     mode: 0600
   when: janus_privkey.changed
 
 - name: Calculate public key
-  command: ssh-keygen -f "region/janus-{{ env.region }}-{{ env.name }}.key" -y
+  command: ssh-keygen -f "region/{{ env.cluster_name }}.key" -y
   changed_when: false
   register: janus_pubkey_cmd
   when: janus_privkey.changed
@@ -27,7 +27,7 @@
 - name: Store public key locally
   copy:
     content: "{{ janus_pubkey_cmd.stdout }} "
-    dest: "region/janus-{{ env.region }}-{{ env.name }}.key.pub"
+    dest: "region/{{ env.cluster_name }}.key.pub"
   when: janus_privkey.changed
 
 - name: Push EC2 public key to access instances
@@ -35,4 +35,4 @@
     region: "{{ env.region }}"
     name: "JanusKey_{{ env.name }}"
     key_material: "{{ item }}"
-  with_file: "region/janus-{{ env.region }}-{{ env.name }}.key.pub"
+  with_file: "region/{{ env.cluster_name }}.key.pub"
