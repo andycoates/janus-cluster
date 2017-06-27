@@ -3,16 +3,16 @@ env:
   region: "{{ aws_region }}"
   name: "{{ env_name }}"
   cluster_name: "janus-{{ aws_region }}-{{ env_name }}"
-  instance_type: m4.xlarge
+  instance_type: r4.large
   ami: ami-a18392c2  # Amazon AMI
   ami_user: ec2-user
-  ami_root_gb: 50
-  ami_data_gb: 100
+  ami_root_gb: 20
+  ami_data_gb: 50
   vpc_cidr: "10.0.0.0/23"
   zones:
     - zone: "{{ aws_region }}a"
       subnet_cidr: "10.0.0.0/24"
-      servers: 10
+      servers: 2
     #- zone: "{{ aws_region }}c"
     #  subnet_cidr: "10.0.1.0/24"
     #  servers: 4
